@@ -77,7 +77,7 @@ class WakeView(discord.ui.View):
 @bot.command(name='wake', help='Allumer un serveur')
 async def wake(ctx):
     if ROLE_ID in [role.id for role in ctx.author.roles]:
-        embed = discord.Embed(title='Allumage un serveur', description='Sélectionnez un serveur à allumer', color=0x3498db)
+        embed = discord.Embed(title='Allumer un serveur', description='Sélectionnez un serveur à allumer', color=0x3498db)
         view = WakeView()
         embed.set_footer(text='By Cystem32')
         await ctx.send(embed=embed, view=view)
