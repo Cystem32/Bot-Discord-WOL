@@ -1,9 +1,10 @@
 --By Cystem32--
+Ce bot et tout droit reserver donc les personnes qui ont pas l'autorisation pour l'utiliser l'utilise pas.
 
--Pour lancer le bot il vous faut:
+Pour utiliser le bot il faut:
+-Discord.py
+pip install -U discord.py
+-La dernier version de python
 
-discord.py
-
-pip install discord.py
-
-et c'est tout maintenant il vous faut juste le configurer et le lancer.
+Voila tout ce qui faut.
+il vous reste que a configure le bot dans le fichier config.py
