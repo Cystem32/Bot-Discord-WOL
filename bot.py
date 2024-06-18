@@ -51,7 +51,7 @@ class WakeSelect(discord.ui.Select):
             magic_packet = bytearray.fromhex('FF FF FF FF FF FF') + bytearray.fromhex(mac.replace(':', '') * 16)
             sock.sendto(magic_packet, ('255.255.255.255', 9))
             sock.close()
-            embed = discord.Embed(title='Allumer du serveur', description=f'Paquet WOL envoyé à {server} ({ip})', color=0x3498db)
+            embed = discord.Embed(title='Allumer un serveur', description=f'Paquet WOL envoyé à {server} ({ip})', color=0x3498db)
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
             # Vérificationsi le serveur est allumé
@@ -60,7 +60,7 @@ class WakeSelect(discord.ui.Select):
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((ip, 22))
                 sock.close()
-                embed = discord.Embed(title='Allumage du serveur', description=f'Le serveur {server} ({ip}) est maintenant allumé!', color=0x00ff00)
+                embed = discord.Embed(title='Information du serveur', description=f'Le serveur {server} ({ip}) est maintenant allumé!', color=0x00ff00)
                 await interaction.followup.send(embed=embed, ephemeral=True)
             except socket.error:
                 embed = discord.Embed(title='Erreur du serveur', description=f'Erreur : le serveur {server} ({ip}) n\'est pas allumé.', color=0xff0000)
