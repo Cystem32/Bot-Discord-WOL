@@ -20,10 +20,10 @@ bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents)
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     guild = bot.get_guild(GUILD_ID)
-    print(f'Guild : {guild.name}')
+    print(f'Serveur : {guild.name}')
     activity = discord.Activity(type=discord.ActivityType.playing, name='By Cystem32')
     await bot.change_presence(activity=activity)
-    print('le bot est pret')
+    print('By Cystem32')
 
 @bot.event
 async def on_member_update(before, after):
@@ -79,6 +79,7 @@ async def wake(ctx):
     if ROLE_ID in [role.id for role in ctx.author.roles]:
         embed = discord.Embed(title='Allumage un serveur', description='Sélectionnez un serveur à allumer', color=0x3498db)
         view = WakeView()
+        embed.set_footer(text='By Cystem32')
         await ctx.send(embed=embed, view=view)
         await asyncio.sleep(10)
     else:
@@ -127,6 +128,32 @@ async def stats_error(ctx, error):
         await ctx.send(embed=embed, ephemeral=True)
     else:
         embed = discord.Embed(title='Erreur', description=f'Erreur : {error}', color=0xff0000)
+        await ctx.send(embed=embed, ephemeral=True)
+
+@bot.command(name='aide', help='Affiche l\'aide du bot')
+async def help(ctx):
+    embed = discord.Embed(title='Aide du bot', description='Liste des commandes disponibles', color=0x3498db)
+
+    embed.add_field(name='`wake`', value='Allume un serveur', inline=False)
+    embed.add_field(name='`stats`', value='Affiche les statistiques des serveurs', inline=False)
+    embed.add_field(name='`Rename`', value='Changer le surnom du bot', inline=False)
+
+    embed.set_footer(text='By Cystem32')
+
+    await ctx.send(embed=embed)
+
+@bot.command(name='rename', help='Changer le surnom du bot')
+async def setnick(ctx, *, new_nickname):
+    if ROLE_ID in [role.id for role in ctx.author.roles]:
+        try:
+            await ctx.guild.me.edit(nick=new_nickname)
+            embed = discord.Embed(title='Succès', description=f'Le surnom du bot a été changé en {new_nickname}', color=0x00ff00)
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            embed = discord.Embed(title='Erreur', description='Le bot n\'a pas les permissions nécessaires pour changer son surnom.', color=0xff0000)
+            await ctx.send(embed=embed, ephemeral=True)
+    else:
+        embed = discord.Embed(title='Erreur', description='Vous n\'avez pas le rôle nécessaire pour utiliser cette commande.', color=0xff0000)
         await ctx.send(embed=embed, ephemeral=True)
 
 bot.run(TOKEN)
