@@ -156,6 +156,15 @@ async def setnick(ctx, *, new_nickname):
         embed = discord.Embed(title='Erreur', description='Vous n\'avez pas le rôle nécessaire pour utiliser cette commande.', color=0xff0000)
         await ctx.send(embed=embed, ephemeral=True)
 
+@bot.command(name='stop', help='Arrête le bot')
+async def stop(ctx):
+    if ctx.author.id == OWNER_ID:
+        await ctx.send('Arrêt du bot...')
+        await bot.close()
+    else:
+        embed = discord.Embed(title='Erreur', description='Vous n\'êtes pas le propriétaire du serveur.', color=0xff0000)
+        await ctx.send(embed=embed, ephemeral=True)
+
 bot.run(TOKEN)
 
 # By Cystem32
