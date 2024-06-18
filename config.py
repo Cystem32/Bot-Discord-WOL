@@ -5,6 +5,8 @@ WAIT_TIME = '30' # Le temp d'attente pour que le bot verifie que le serveur est 
 ROLE_ID = '' # le role qui peut faire la commande "wake"
 GUILD_ID = '' # L'id de la Guild
 OWNER_ID = '' # L'id de l'owner pour fait la commande "stats"
+SSH_USER = ''
+SSH_PASSWORD = ''
 
 #La liste des serveurs
 servers = {

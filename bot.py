@@ -5,6 +5,7 @@ from discord.ext import commands
 import socket
 import asyncio
 from config import *
+import paramiko
 
 intents = discord.Intents.default()
 intents.typing = False
@@ -93,7 +94,7 @@ async def wake_error(ctx, error):
         await ctx.send(embed=embed, ephemeral=True)
     else:
         embed = discord.Embed(title='Erreur', description=f'Erreur : {error}', color=0xff0000)
-        await ctx.send(embed=embed, ephemeral=True)
+        await ctx.send(embed=embed,ephemeral=True)
 
 async def update_stats(message):
     while True:
@@ -130,13 +131,60 @@ async def stats_error(ctx, error):
         embed = discord.Embed(title='Erreur', description=f'Erreur : {error}', color=0xff0000)
         await ctx.send(embed=embed, ephemeral=True)
 
+class ShutdownView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+class ShutdownButton(discord.ui.Button):
+    def __init__(self, server):
+        super().__init__(style=discord.ButtonStyle.danger, label="Éteindre le serveur")
+        self.custom_id = server
+
+    async def callback(self, interaction: discord.Interaction):
+        server = self.custom_id
+        try:
+            # Connexion au serveur via SSH
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(servers[server]['ip'], username= SSH_USER, password= SSH_PASSWORD)
+
+            # Exécution de la commande pour éteindre le serveur
+            stdin, stdout, stderr = ssh.exec_command('sudo shutdown -h now')
+
+            # Attente de la fin de l'exécution de la commande
+            stdout.channel.recv_exit_status()
+
+            # Déconnexion du serveur
+            ssh.close()
+
+            embed = discord.Embed(title='Succès', description=f'Le serveur {server} a été éteint.', color=0x00ff00)
+            await interaction.response.send_message(embed=embed)
+        except Exception as e:
+            embed = discord.Embed(title='Erreur', description=f'Erreur lors de l\'extinction du serveur {server} : {e}', color=0xff0000)
+            await interaction.response.send_message(embed=embed)
+
+@bot.command(name='shutdown', help='Éteindre un serveur')
+async def shutdown(ctx):
+    if ROLE_ID in [role.id for role in ctx.author.roles]:
+        view = ShutdownView()
+        embed = discord.Embed(title='Éteindre un serveur', description='Sélectionnez un serveur à éteindre', color=0x3498db)
+        for server in servers:
+            button = ShutdownButton(server)
+            view.add_item(button)
+        await ctx.send(embed=embed, view=view)
+    else:
+        embed = discord.Embed(title='Erreur', description='Vous n\'avez pas le rôle nécessaire pour utiliser cette commande.', color=0xff0000)
+        await ctx.send(embed=embed, ephemeral=True)
+
 @bot.command(name='aide', help='Affiche l\'aide du bot')
 async def help(ctx):
     embed = discord.Embed(title='Aide du bot', description='Liste des commandes disponibles', color=0x3498db)
 
     embed.add_field(name='`wake`', value='Allume un serveur', inline=False)
     embed.add_field(name='`stats`', value='Affiche les statistiques des serveurs', inline=False)
-    embed.add_field(name='`Rename`', value='Changer le surnom du bot', inline=False)
+    embed.add_field(name='`shutdown`', value='Éteindre un serveur', inline=False)
+    embed.add_field(name='`rename`', value='Changer le surnom du bot', inline=False)
+    embed.add_field(name='`stop`', value='Arrête le bot', inline=False)
 
     embed.set_footer(text='By Cystem32')
 
@@ -166,5 +214,3 @@ async def stop(ctx):
         await ctx.send(embed=embed, ephemeral=True)
 
 bot.run(TOKEN)
-
-# By Cystem32
