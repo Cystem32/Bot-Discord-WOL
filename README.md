@@ -8,6 +8,8 @@ Pour utiliser le bot il faut:
 
 pip install -U discord.py
 
+pip install paramiko
+
 -La dernier version de python
 
 
