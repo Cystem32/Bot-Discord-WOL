@@ -5,8 +5,10 @@ from discord.ext import commands
 import socket
 import asyncio
 import paramiko
-from config import ROLE_ID, GUILD_ID, servers, WAIT_TIME, SSH_USER, SSH_PASSWORD, OWNER_ID
+import datetime
+from config import *
 
+# Custom Select Menu for server selection
 class WakeSelect(discord.ui.Select):
     def __init__(self):
         options = [
@@ -20,17 +22,18 @@ class WakeSelect(discord.ui.Select):
         mac = servers[server]['mac']
         ip = servers[server]['ip']
 
-        # Envoi du paquet WOL
+        # Envoie du paquet WOL
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             magic_packet = bytearray.fromhex('FF FF FF FF FF FF') + bytearray.fromhex(mac.replace(':', '') * 16)
             sock.sendto(magic_packet, ('255.255.255.255', 9))
             sock.close()
+
             embed = discord.Embed(title='Allumer un serveur', description=f'Paquet WOL envoyé à {server} ({ip})', color=0x3498db)
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
-            # Vérificationsi le serveur est allumé
+            # Vérification si le serveur est allumé
             await asyncio.sleep(WAIT_TIME)
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,15 +48,18 @@ class WakeSelect(discord.ui.Select):
             embed = discord.Embed(title='Erreur de l\'envoie', description=f'Erreur lors de l\'envoi du paquet WOL à {server} ({ip}) : {e}', color=0xff0000)
             await interaction.followup.send(embed=embed, ephemeral=True)
 
+# View for wake command
 class WakeView(discord.ui.View):
     def __init__(self):
         super().__init__()
         self.add_item(WakeSelect())
 
+# View for shutdown command
 class ShutdownView(discord.ui.View):
     def __init__(self):
         super().__init__()
 
+# Button for shutdown command
 class ShutdownButton(discord.ui.Button):
     def __init__(self, server):
         super().__init__(style=discord.ButtonStyle.danger, label="Éteindre le serveur")
@@ -82,22 +88,37 @@ class ShutdownButton(discord.ui.Button):
             embed = discord.Embed(title='Erreur', description=f'Erreur lors de l\'extinction du serveur {server} : {e}', color=0xff0000)
             await interaction.response.send_message(embed=embed)
 
+# Cog for the commands
 class Commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # Wake command
     @commands.command(name='wake', help='Allumer un serveur')
     async def wake(self, ctx):
         if ROLE_ID in [role.id for role in ctx.author.roles]:
-            embed = discord.Embed(title='Allumer un serveur', description='Sélectionnez un serveur à allumer', color=0x3498db)
-            view = WakeView()
-            embed.set_footer(text='By Cystem32')
-            await ctx.send(embed=embed, view=view)
-            await asyncio.sleep(10)
+            # Get the current time
+            now = datetime.datetime.now()
+
+            # Get the allowed hours from the config file
+            start_hour = int(START_HOUR)
+            end_hour = int(END_HOUR)
+
+            # Check if the current time is within the allowed hours
+            if start_hour <= now.hour and now.hour < end_hour:
+                embed = discord.Embed(title='Allumer un serveur', description='Sélectionnez un serveur à allumer', color=0x3498db)
+                view = WakeView()
+                embed.set_footer(text='By Cystem32')
+                await ctx.send(embed=embed, view=view)
+                await asyncio.sleep(10)
+            else:
+                embed = discord.Embed(title='Erreur', description=f'Erreur : la commande wake est uniquement disponible entre {start_hour}h et {end_hour}h.', color=0xff0000)
+                await ctx.send(embed=embed, ephemeral=True)
         else:
             embed = discord.Embed(title='Erreur', description='Vous n\'avez pas le rôle nécessaire pour utiliser cette commande.', color=0xff0000)
             await ctx.send(embed=embed, ephemeral=True)
 
+    # Error handling for wake command
     @wake.error
     async def wake_error(self, ctx, error):
         if isinstance(error, commands.MissingRole):
@@ -107,6 +128,7 @@ class Commands(commands.Cog):
             embed = discord.Embed(title='Erreur', description=f'Erreur : {error}', color=0xff0000)
             await ctx.send(embed=embed,ephemeral=True)
 
+    # Update server statistics
     async def update_stats(self, message):
         while True:
             embed = discord.Embed(title='Statistiques des serveurs', color=0x3498db)
@@ -123,6 +145,7 @@ class Commands(commands.Cog):
             await message.edit(embed=embed)
             await asyncio.sleep(5)
 
+    # Stats command
     @commands.command(name='stats', help='Affiche les statistiques des serveurs')
     async def stats(self, ctx):
         if ctx.author.id == OWNER_ID:
@@ -133,6 +156,7 @@ class Commands(commands.Cog):
             embed = discord.Embed(title='Erreur', description='Vous n\'êtes pas le propriétaire du serveur.', color=0xff0000)
             await ctx.send(embed=embed, ephemeral=True)
 
+    # Error handling for stats command
     @stats.error
     async def stats_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
@@ -142,6 +166,7 @@ class Commands(commands.Cog):
             embed = discord.Embed(title='Erreur', description=f'Erreur : {error}', color=0xff0000)
             await ctx.send(embed=embed, ephemeral=True)
 
+    # Shutdown command
     @commands.command(name='shutdown', help='Éteindre un serveur')
     async def shutdown(self, ctx):
         if ROLE_ID in [role.id for role in ctx.author.roles]:
@@ -155,6 +180,7 @@ class Commands(commands.Cog):
             embed = discord.Embed(title='Erreur', description='Vous n\'avez pas le rôle nécessaire pour utiliser cette commande.', color=0xff0000)
             await ctx.send(embed=embed, ephemeral=True)
 
+    # Help command
     @commands.command(name='aide', help='Affiche l\'aide du bot')
     async def help(self, ctx):
         embed = discord.Embed(title='Aide du bot', description='Liste des commandes disponibles', color=0x3498db)
@@ -169,9 +195,10 @@ class Commands(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    # Rename command
     @commands.command(name='rename', help='Changer le surnom du bot')
     async def setnick(self, ctx, *, new_nickname):
-        if ROLE_ID in [role.id for role in ctx.author.roles]:
+        if ctx.author.id == OWNER_ID:
             try:
                 await ctx.guild.me.edit(nick=new_nickname)
                 embed = discord.Embed(title='Succès', description=f'Le surnom du bot a été changé en {new_nickname}', color=0x00ff00)
@@ -183,6 +210,7 @@ class Commands(commands.Cog):
             embed = discord.Embed(title='Erreur', description='Vous n\'avez pas le rôle nécessaire pour utiliser cette commande.', color=0xff0000)
             await ctx.send(embed=embed, ephemeral=True)
 
+    # Stop command
     @commands.command(name='stop', help='Arrête le bot')
     async def stop(self, ctx):
         if ctx.author.id == OWNER_ID:
@@ -194,3 +222,5 @@ class Commands(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))
+
+# Copyright (c) 2024 Cystem32
