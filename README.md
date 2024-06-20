@@ -1,6 +1,4 @@
---By Cystem32--
-
-Ce bot et tout droit reserver donc les personnes qui ont pas l'autorisation pour l'utiliser l'utilise pas.
+# --By Cystem32--
 
 Pour utiliser le bot il faut:
 
