@@ -1,16 +1,22 @@
 # --By Cystem32--
 
-Pour utiliser le bot il faut:
+# Projet Discord Bot Wol
 
--Discord.py
+Bienvenue dans le projet **Discord Bot** ! Ce bot est conçu pour utiliser le WOL a partir de votre serveur Discord. Suivez les instructions ci-dessous pour installer et configurer le bot sur votre machine.
 
-pip install -U discord.py
+## Prérequis
 
-pip install paramiko
+- **Python**: Assurez-vous d'avoir la dernière version de Python installée sur votre machine. Vous pouvez la télécharger depuis le site officiel : [Python Downloads](https://www.python.org/downloads/).
 
--La dernier version de python
+## Dépendances nécessaires
 
+-pip install -U discord.py
+-pip install paramiko
 
-Voila tout ce qui faut.
+## Installation
 
-il vous reste que a configure le bot dans le fichier config.py
+Clonez ce dépôt sur votre machine locale :
+
+```sh
+git clone https://github.com/Cystem32/Bot-Discord-WOL.git
+cd votre-depot
