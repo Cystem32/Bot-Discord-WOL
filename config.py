@@ -12,6 +12,10 @@ SSH_PASSWORD = ''
 START_HOUR = 8   # Exemple 8=8h
 END_HOUR = 18    # Exemple 18=18h
 
+# Auto off horaire / Logs channel auto  off
+AUTO_OFF_HOUR = 23   # Exemple 23=23h
+LOG_CHANNEL = 123456789 # L'id du salon
+
 #La liste des serveurs
 servers = {
     'Serveur-1': {'mac': '00:00:00:00:00:00', 'ip': '127.0.0.1'},
