@@ -1,6 +1,6 @@
 # --By Cystem32--
 
-# Projet Discord Bot Wol
+# Projet Discord Bot WOL
 
 Bienvenue dans le projet **Discord Bot** ! Ce bot est conçu pour utiliser le WOL a partir de votre serveur Discord. Suivez les instructions ci-dessous pour installer et configurer le bot sur votre machine.
 
