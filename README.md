@@ -19,4 +19,5 @@ Clonez ce dépôt sur votre machine locale :
 
 ```sh
 git clone https://github.com/Cystem32/Bot-Discord-WOL.git
-cd votre-depot
+cd Bot-Discord-WOL
+python bot.py
