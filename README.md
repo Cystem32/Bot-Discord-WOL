@@ -10,8 +10,8 @@ Bienvenue dans le projet **Discord Bot** ! Ce bot est conçu pour utiliser le WO
 
 ## Dépendances nécessaires
 
--pip install -U discord.py
--pip install paramiko
+- pip install -U discord.py
+- pip install paramiko
 
 ## Installation
 
