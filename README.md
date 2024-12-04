@@ -14,7 +14,7 @@ Bienvenue dans le projet **Discord Bot** ! Ce bot est conçu pour utiliser le WO
 - pip install paramiko
 
 ## Installation
-
+Pensez a modifier le config.py !!
 Clonez ce dépôt sur votre machine locale :
 
 ```sh
